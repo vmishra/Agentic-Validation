@@ -8,7 +8,8 @@ import { Report } from '@/ui/Scorecard'
 export function App() {
   const view = useStore((s) => s.view)
   const loadHistory = useStore((s) => s.loadHistory)
-  useEffect(() => { void loadHistory() }, [loadHistory])
+  const loadConfig = useStore((s) => s.loadConfig)
+  useEffect(() => { void loadHistory(); void loadConfig() }, [loadHistory, loadConfig])
   return (
     <Shell>
       {view === 'source' && <SourceStep />}

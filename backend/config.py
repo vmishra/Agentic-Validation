@@ -49,6 +49,10 @@ ZIP_MAX_FILES = 20_000
 CLONE_TIMEOUT_S = 60
 RUN_TIMEOUT_S = int(os.getenv("AEGIS_RUN_TIMEOUT", "300"))  # backstop for very large repos
 
+# Local-folder scanning reads the server's filesystem — safe locally, but a security
+# risk on a shared/hosted deployment. Set AEGIS_ALLOW_FOLDER=false in the cloud.
+ALLOW_FOLDER = os.getenv("AEGIS_ALLOW_FOLDER", "true").lower() != "false"
+
 SCAN_ROOT = pathlib.Path(os.getenv("AEGIS_SCAN_ROOT", tempfile.gettempdir())) / "aegis-scans"
 SCAN_ROOT.mkdir(parents=True, exist_ok=True)
 

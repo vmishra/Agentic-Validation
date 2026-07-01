@@ -1,9 +1,10 @@
 """Aegis FastAPI backend: scan registration, SSE streaming, report + export."""
 from __future__ import annotations
-import json, uuid
+import json, uuid, pathlib
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
 import config, pipeline, export
 from schemas import ValidationReport
 
@@ -39,7 +40,8 @@ def _load_report(scan_id: str) -> dict | None:
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"ok": True, "model": config.MODEL, "keyConfigured": bool(config.api_key())}
+    return {"ok": True, "model": config.MODEL, "keyConfigured": bool(config.api_key()),
+            "allowFolder": config.ALLOW_FOLDER}
 
 @app.post("/api/scan")
 async def create_scan(request: Request):
@@ -72,6 +74,9 @@ async def create_scan(request: Request):
     if file_bytes is not None:
         source = {"kind": "zip", "data": file_bytes, "name": filename}
     elif folder_path:
+        if not config.ALLOW_FOLDER:
+            raise HTTPException(400, "Local folder scanning is disabled on this deployment. "
+                                     "Use a GitHub URL or a .zip upload.")
         source = {"kind": "folder", "path": folder_path}
     elif github_url:
         source = {"kind": "github", "url": github_url}
@@ -135,6 +140,12 @@ def export_report(scan_id: str, format: str = "json"):
     return PlainTextResponse(export.to_json(rep), media_type="application/json",
         headers={"Content-Disposition": f'attachment; filename="aegis-{scan_id}.json"'})
 
+# Serve the built frontend (single-image deploys). API routes above take precedence;
+# this catch-all mount serves index.html + assets. Absent in local dev (Vite serves the UI).
+_DIST = pathlib.Path(__file__).resolve().parent.parent / "dist"
+if _DIST.is_dir():
+    app.mount("/", StaticFiles(directory=str(_DIST), html=True), name="static")
+
 if __name__ == "__main__":
     import uvicorn, os
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("AEGIS_PORT", "8000")))
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", os.getenv("AEGIS_PORT", "8000"))))

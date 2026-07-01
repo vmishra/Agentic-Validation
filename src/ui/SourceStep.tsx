@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FolderGit2, Github, Upload, Play, FileText, Check, History, ChevronRight } from 'lucide-react'
 import { useStore } from '@/state/store'
 import { Segmented, SectionLabel } from './primitives'
@@ -17,9 +17,12 @@ export function SourceStep() {
   const startScan = useStore((s) => s.startScan)
   const openScan = useStore((s) => s.openScan)
   const history = useStore((s) => s.history)
+  const allowFolder = useStore((s) => s.allowFolder)
   const error = useStore((s) => s.error)
 
   const [tab, setTab] = useState<Tab>('github')
+  // On a hosted deployment folder scanning is disabled; never leave the user on that tab.
+  useEffect(() => { if (!allowFolder && tab === 'folder') setTab('github') }, [allowFolder, tab])
   const [url, setUrl] = useState('')
   const [path, setPath] = useState('')
   const [file, setFile] = useState<File | null>(null)
@@ -59,7 +62,7 @@ export function SourceStep() {
           onChange={(v) => setTab(v as Tab)}
           options={[
             { value: 'github', label: 'GitHub URL' },
-            { value: 'folder', label: 'Local folder' },
+            ...(allowFolder ? [{ value: 'folder', label: 'Local folder' }] : []),
             { value: 'zip', label: 'Upload .zip' },
           ]}
         />

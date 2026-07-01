@@ -1,0 +1,21 @@
+# never ship secrets or local state into the image / build context
+.env
+.env.local
+.aegis-history/
+
+# rebuilt inside the image
+dist/
+node_modules/
+.venv/
+
+# vcs / caches / os / tooling
+.git/
+.gitignore
+**/__pycache__/
+*.pyc
+.pytest_cache/
+*.tsbuildinfo
+.app.log
+.app.pid
+.DS_Store
+docs/

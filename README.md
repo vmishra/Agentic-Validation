@@ -117,6 +117,21 @@ Ports are set on the shell (read by `app.sh` and Vite):
 AEGIS_FE_PORT=3000 AEGIS_BE_PORT=9000 ./app.sh start
 ```
 
+## Deploy to Cloud Run (private, Google SSO)
+
+Ship Aegis as an internal web app protected by **Identity-Aware Proxy** — only your
+Google Workspace domain (e.g. `@google.com`) can sign in. One command:
+
+```bash
+gcloud config set project YOUR_PROJECT
+./deploy.sh
+```
+
+It builds a container (frontend + backend in one image), deploys to Cloud Run with IAP,
+stores your key in **Secret Manager**, and restricts access to `domain:google.com` — no
+load balancer needed. Local-folder scanning is auto-disabled in the cloud (users scan via
+GitHub URL or `.zip`). Full guide, options, and teardown: **[`docs/DEPLOY.md`](docs/DEPLOY.md)**.
+
 ## Development
 
 ```bash

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { CategoryScore, Finding, Overview, ScanEvent, ScanSummary, ValidationReport } from '@/validator/types'
-import { createScan, openStream, listScans, getReport, type ScanSource } from '@/lib/sse'
+import { createScan, openStream, listScans, getReport, getConfig, type ScanSource } from '@/lib/sse'
 
 export type LogItem =
   | { kind: 'phase'; label: string }
@@ -64,10 +64,12 @@ export function applyEvent(s: ViewState, e: ScanEvent): ViewState {
 
 interface Store extends ViewState {
   history: ScanSummary[]
+  allowFolder: boolean
   lastSource?: ScanSource
   startScan: (source: ScanSource) => Promise<void>
   retry: () => void
   loadHistory: () => Promise<void>
+  loadConfig: () => Promise<void>
   openScan: (scanId: string) => Promise<void>
   reset: () => void
 }
@@ -75,6 +77,8 @@ interface Store extends ViewState {
 export const useStore = create<Store>((set, get) => ({
   ...initialViewState(),
   history: [],
+  allowFolder: true,
+  loadConfig: async () => { const c = await getConfig(); set({ allowFolder: c.allowFolder }) },
   loadHistory: async () => {
     try { set({ history: await listScans() }) } catch { /* offline — keep current */ }
   },

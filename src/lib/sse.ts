@@ -48,3 +48,12 @@ export async function getReport(scanId: string): Promise<ValidationReport> {
   if (!r.ok) throw new Error('Report not found')
   return r.json()
 }
+
+export interface AppConfig { allowFolder: boolean; keyConfigured: boolean; model: string }
+export async function getConfig(): Promise<AppConfig> {
+  try {
+    const r = await fetch('/api/health')
+    if (r.ok) return await r.json()
+  } catch { /* offline */ }
+  return { allowFolder: true, keyConfigured: false, model: '' }
+}
