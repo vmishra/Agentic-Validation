@@ -124,12 +124,12 @@ Google Workspace domain (e.g. `@google.com`) can sign in. One command:
 
 ```bash
 gcloud config set project YOUR_PROJECT
-./deploy.sh
+AEGIS_ALLOWED_DOMAIN=your-company.com ./deploy.sh
 ```
 
 It builds a container (frontend + backend in one image), deploys to Cloud Run with IAP,
-stores your key in **Secret Manager**, and restricts access to `domain:google.com` — no
-load balancer needed. Local-folder scanning is auto-disabled in the cloud (users scan via
+stores your key in **Secret Manager**, and restricts access to your Google Workspace
+domain (`AEGIS_ALLOWED_DOMAIN`) — no load balancer needed. Local-folder scanning is auto-disabled in the cloud (users scan via
 GitHub URL or `.zip`). Full guide, options, and teardown: **[`docs/DEPLOY.md`](docs/DEPLOY.md)**.
 
 ## Development

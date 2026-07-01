@@ -2,12 +2,12 @@
 
 Deploy Aegis as an internal web app on **Google Cloud Run**, protected by
 **Identity-Aware Proxy (IAP)** so only accounts in your Google Workspace domain
-(e.g. `@google.com`) can sign in. No load balancer required.
+(e.g. `@your-company.com`) can sign in. No load balancer required.
 
-The whole thing is one command:
+The whole thing is one command (set your domain):
 
 ```bash
-./deploy.sh
+AEGIS_ALLOWED_DOMAIN=your-company.com ./deploy.sh
 ```
 
 ---
@@ -16,7 +16,7 @@ The whole thing is one command:
 
 - A containerized single image (frontend built + served by the FastAPI backend).
 - **IAP** in front of the `run.app` URL → Google sign-in required.
-- Access restricted to **`domain:google.com`** (configurable).
+- Access restricted to **your Workspace domain** (set via `AEGIS_ALLOWED_DOMAIN`).
 - The Gemini key stored in **Secret Manager** (not baked into the image or env).
 - Local-folder scanning **disabled** in the cloud (users scan via GitHub URL or `.zip`).
 
@@ -36,10 +36,12 @@ The whole thing is one command:
 # pick your project (once)
 gcloud config set project YOUR_PROJECT
 
+# required — your Google Workspace domain
+export AEGIS_ALLOWED_DOMAIN=your-company.com
+
 # optional overrides
-export AEGIS_REGION=us-central1        # default
-export AEGIS_SERVICE=aegis             # default
-export AEGIS_ALLOWED_DOMAIN=google.com # default
+export AEGIS_REGION=us-central1   # default
+export AEGIS_SERVICE=aegis        # default
 
 ./deploy.sh
 ```
@@ -51,7 +53,7 @@ The script:
    service account access.
 3. Builds from source and deploys to Cloud Run with `--no-allow-unauthenticated --iap`.
 4. Creates the IAP service agent and grants it `roles/run.invoker`.
-5. Grants `roles/iap.httpsResourceAccessor` to `domain:google.com`.
+5. Grants `roles/iap.httpsResourceAccessor` to `domain:<AEGIS_ALLOWED_DOMAIN>`.
 6. Prints the URL.
 
 > First-time IAP enablement occasionally needs a minute for the service agent to
@@ -59,9 +61,9 @@ The script:
 
 ## Test it
 
-Open the printed URL. You'll be sent through Google sign-in; a `@google.com` account
-gets in, anyone else gets a 403. IAM can take a few minutes to propagate right after
-the first enable.
+Open the printed URL. You'll be sent through Google sign-in; an account in your allowed
+domain gets in, anyone else gets a 403. IAM can take a few minutes to propagate right
+after the first enable.
 
 ## Grant access to specific people or a group
 
@@ -71,7 +73,7 @@ and add a group or users instead:
 ```bash
 gcloud beta iap web add-iam-policy-binding \
   --resource-type=cloud-run --service=aegis --region=us-central1 \
-  --member="group:my-team@google.com" --role=roles/iap.httpsResourceAccessor
+  --member="group:my-team@your-company.com" --role=roles/iap.httpsResourceAccessor
 ```
 
 ## Update / redeploy
@@ -108,7 +110,7 @@ Configure once under **Settings → Secrets and variables → Actions**:
 | Secret | `GEMINI_API_KEY` | your AI Studio key |
 | Variable | `GCP_PROJECT` | project id |
 | Variable | `AEGIS_REGION` | optional (default `us-central1`) |
-| Variable | `AEGIS_ALLOWED_DOMAIN` | optional (default `google.com`) |
+| Variable | `AEGIS_ALLOWED_DOMAIN` | **required** — your Workspace domain (e.g. `your-company.com`) |
 
 Set up WIF once (link the pool to your repo) following
 <https://github.com/google-github-actions/auth#preferred-direct-workload-identity-federation>,

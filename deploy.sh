@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Deploy Aegis to Google Cloud Run, protected by Identity-Aware Proxy (IAP) and
-# restricted to a single Google Workspace domain (default: google.com).
+# restricted to a single Google Workspace domain (set AEGIS_ALLOWED_DOMAIN).
 #
 # One command:  ./deploy.sh
 #
@@ -9,7 +9,7 @@
 #   AEGIS_PROJECT           GCP project id      (default: gcloud config's project)
 #   AEGIS_REGION            Cloud Run region    (default: us-central1)
 #   AEGIS_SERVICE           service name        (default: aegis)
-#   AEGIS_ALLOWED_DOMAIN    Workspace domain    (default: google.com)
+#   AEGIS_ALLOWED_DOMAIN    Workspace domain    (REQUIRED, e.g. your-company.com)
 #   AEGIS_MODEL             Gemini model        (default: gemini-3.5-flash)
 #   GEMINI_API_KEY          your key            (default: read from ./.env)
 #
@@ -21,11 +21,12 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; cd "$ROOT"
 PROJECT="${AEGIS_PROJECT:-$(gcloud config get-value project 2>/dev/null || true)}"
 REGION="${AEGIS_REGION:-us-central1}"
 SERVICE="${AEGIS_SERVICE:-aegis}"
-DOMAIN="${AEGIS_ALLOWED_DOMAIN:-google.com}"
+DOMAIN="${AEGIS_ALLOWED_DOMAIN:-}"
 MODEL="${AEGIS_MODEL:-gemini-3.5-flash}"
 SECRET="aegis-gemini-key"
 
 [ -n "$PROJECT" ] || { echo "✗ No project. Run: gcloud config set project YOUR_PROJECT  (or set AEGIS_PROJECT)"; exit 1; }
+[ -n "$DOMAIN" ] || { echo "✗ Set AEGIS_ALLOWED_DOMAIN to your Google Workspace domain, e.g.:"; echo "     AEGIS_ALLOWED_DOMAIN=your-company.com ./deploy.sh"; exit 1; }
 
 # Resolve the API key: env var wins, else read from .env.
 KEY="${GEMINI_API_KEY:-}"

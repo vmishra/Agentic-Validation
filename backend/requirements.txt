@@ -3,7 +3,6 @@ google-genai
 fastapi>=0.115
 uvicorn[standard]
 python-dotenv
-gitpython
 pydantic>=2
 pytest
 pytest-asyncio

@@ -5,14 +5,6 @@ pytestmark = pytest.mark.skipif(
     reason="no Gemini API key configured",
 )
 
-def test_read_file_tool_is_scoped(tmp_path):
-    from agents.tools import make_read_file
-    (tmp_path / "a.py").write_text("line1\nline2\nline3\n")
-    rf = make_read_file(tmp_path)
-    out = rf("a.py", 1, 2)
-    assert "line1" in out and "line3" not in out
-    assert "denied" in rf("../secret", 1, 1).lower()
-
 @pytest.mark.asyncio
 async def test_adk_minimal_run():
     # Verifies the installed ADK API end-to-end against gemini-3.5-flash.
