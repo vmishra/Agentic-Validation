@@ -1,0 +1,23 @@
+# secrets / env
+.env
+.env.local
+
+# python
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+
+# node / build
+node_modules/
+dist/
+*.tsbuildinfo
+
+# runtime
+.app.pid
+.app.log
+.aegis-history/
+
+# tooling / os
+.DS_Store

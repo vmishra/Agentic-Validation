@@ -1,0 +1,255 @@
+/*
+ * Elevate — design tokens.
+ *
+ * Visual language adapted from Agentic-Concierge/DESIGN.md: OKLCH palette, an
+ * 8pt grid, spring motion, tabular numerals, Lucide-only iconography, a 1px
+ * accent hairline that tracks the active agent. Two departures from the
+ * reference, per the brief:
+ *   1. Light is the DEFAULT theme; dark is the sibling (data-theme="dark").
+ *   2. The accent is Google blue, and the four Google brand colors appear —
+ *      sparingly — as agent identity dots and the four Scenario-2 health
+ *      pillars. Surfaces stay neutral; the brand never becomes wallpaper.
+ */
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Geist", ui-serif, serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Google brand — fixed across themes, used as small identity accents only. */
+  --color-g-blue: #4285f4;
+  --color-g-red: #ea4335;
+  --color-g-yellow: #f9ab00;
+  --color-g-green: #34a853;
+}
+
+/* Light — the default. */
+:root,
+:root[data-theme="light"] {
+  --surface: oklch(99% 0.002 250);
+  --surface-raised: oklch(100% 0 0);
+  --elev-1: oklch(98% 0.003 250);
+  --elev-2: oklch(96% 0.004 250);
+  --border: oklch(91% 0.005 250);
+  --border-strong: oklch(84% 0.007 250);
+  --text: oklch(24% 0.012 260);
+  --text-muted: oklch(48% 0.012 260);
+  --text-subtle: oklch(62% 0.010 260);
+
+  /* Google blue, tuned for light surfaces. */
+  --accent: oklch(54% 0.170 258);
+  --accent-strong: oklch(48% 0.180 258);
+  --accent-soft: oklch(54% 0.170 258 / 0.10);
+  --accent-hairline: oklch(54% 0.170 258 / 0.55);
+
+  --trace: oklch(52% 0.060 230);
+  --trace-soft: oklch(52% 0.060 230 / 0.10);
+
+  --danger: oklch(55% 0.190 27);
+  --danger-soft: oklch(55% 0.190 27 / 0.10);
+  --warn: oklch(70% 0.150 70);
+  --warn-soft: oklch(70% 0.150 70 / 0.12);
+  --success: oklch(56% 0.130 152);
+  --success-soft: oklch(56% 0.130 152 / 0.12);
+
+  --shadow-1: 0 1px 0 oklch(100% 0 0 / 0.8) inset, 0 1px 2px oklch(20% 0 0 / 0.05);
+  --shadow-2: 0 1px 0 oklch(100% 0 0 / 0.9) inset, 0 6px 22px -10px oklch(20% 0 0 / 0.14);
+  --shadow-lift: 0 1px 0 oklch(100% 0 0 / 0.9) inset, 0 16px 44px -18px oklch(20% 0 0 / 0.20);
+}
+
+/* Dark — a faithful sibling, not an afterthought. */
+:root[data-theme="dark"] {
+  --surface: oklch(16% 0.012 260);
+  --surface-raised: oklch(19% 0.013 260);
+  --elev-1: oklch(21% 0.014 260);
+  --elev-2: oklch(25% 0.015 260);
+  --border: oklch(30% 0.013 260);
+  --border-strong: oklch(38% 0.015 260);
+  --text: oklch(95% 0.004 260);
+  --text-muted: oklch(70% 0.012 260);
+  --text-subtle: oklch(55% 0.012 260);
+
+  --accent: oklch(75% 0.130 256);
+  --accent-strong: oklch(82% 0.120 256);
+  --accent-soft: oklch(75% 0.130 256 / 0.16);
+  --accent-hairline: oklch(75% 0.130 256 / 0.6);
+
+  --trace: oklch(74% 0.070 225);
+  --trace-soft: oklch(74% 0.070 225 / 0.14);
+
+  --danger: oklch(70% 0.160 27);
+  --danger-soft: oklch(70% 0.160 27 / 0.16);
+  --warn: oklch(80% 0.140 78);
+  --warn-soft: oklch(80% 0.140 78 / 0.16);
+  --success: oklch(75% 0.120 158);
+  --success-soft: oklch(75% 0.120 158 / 0.16);
+
+  --shadow-1: 0 1px 0 oklch(100% 0 0 / 0.05) inset, 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-2: 0 1px 0 oklch(100% 0 0 / 0.06) inset, 0 6px 24px -8px oklch(0% 0 0 / 0.6);
+  --shadow-lift: 0 1px 0 oklch(100% 0 0 / 0.08) inset, 0 18px 48px -16px oklch(0% 0 0 / 0.7);
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-elev-1: var(--elev-1);
+  --color-elev-2: var(--elev-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-subtle: var(--text-subtle);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-trace: var(--trace);
+  --color-trace-soft: var(--trace-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+}
+
+@font-face {
+  font-family: "GeistFallback";
+  src: local("Inter"), local("Helvetica Neue"), local("Arial");
+  size-adjust: 104%;
+  ascent-override: 92%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-sans), "GeistFallback", system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11", "tnum";
+  font-synthesis: none;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Tabular numerals for prices, timestamps, token counts, latency. */
+.numeric,
+[data-numeric] {
+  font-feature-settings: "tnum", "cv11";
+  font-variant-numeric: tabular-nums;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.012em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Hairline utilities. */
+.hairline-b {
+  border-bottom: 1px solid var(--border);
+}
+.hairline-t {
+  border-top: 1px solid var(--border);
+}
+.hairline-r {
+  border-right: 1px solid var(--border);
+}
+.hairline-l {
+  border-left: 1px solid var(--border);
+}
+
+/* Custom scrollbars — quiet, thin, theme-aware. */
+.scroll-area {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.scroll-area::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.scroll-area::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.scroll-area::-webkit-scrollbar-thumb:hover {
+  background: var(--text-subtle);
+  background-clip: content-box;
+}
+
+/* Subtle grain — one static SVG noise, used sparingly on hero panels. */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+}
+
+/* A blinking caret for streaming text. */
+@keyframes caret {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+.caret::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: -0.12em;
+  background: var(--accent);
+  animation: caret 1.05s steps(1) infinite;
+}

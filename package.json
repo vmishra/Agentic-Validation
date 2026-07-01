@@ -1,0 +1,46 @@
+{
+  "name": "aegis-agentic-validation",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Aegis — point it at an AI-agent codebase and a real Google ADK multi-agent validator (Gemini 3.5 Flash) grades it across architecture, functionality, security, performance and more, with concrete fixes.",
+  "license": "MIT",
+  "author": "Vikas Mishra",
+  "keywords": [
+    "ai-agents", "agentic", "validation", "code-analysis", "google-adk",
+    "gemini", "llm", "static-analysis", "security", "developer-tools"
+  ],
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.544.0",
+    "motion": "^12.23.0",
+    "nanoid": "^5.1.5",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.13",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/node": "^24.13.2",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "jsdom": "^25.0.1",
+    "typescript": "~5.9.2",
+    "vite": "^7.1.7",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,10 @@
+google-adk>=1.25.0
+google-genai
+fastapi>=0.115
+uvicorn[standard]
+python-dotenv
+gitpython
+pydantic>=2
+pytest
+pytest-asyncio
+httpx
