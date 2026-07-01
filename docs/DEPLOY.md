@@ -93,6 +93,28 @@ gcloud run services delete aegis --region us-central1
 gcloud secrets delete aegis-gemini-key
 ```
 
+## Deploy from GitHub Actions
+
+`.github/workflows/deploy.yml` deploys on a `v*` tag or a manual run, reusing `deploy.sh`.
+It authenticates with **Workload Identity Federation** — no service-account keys stored in
+GitHub.
+
+Configure once under **Settings → Secrets and variables → Actions**:
+
+| Kind | Name | Value |
+|------|------|-------|
+| Secret | `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/NUMBER/locations/global/workloadIdentityPools/POOL/providers/PROVIDER` |
+| Secret | `GCP_SERVICE_ACCOUNT` | deployer SA email (roles: Run Admin, IAP Admin, Secret Manager Admin, Cloud Build Editor, Service Usage Admin, IAM Security Admin) |
+| Secret | `GEMINI_API_KEY` | your AI Studio key |
+| Variable | `GCP_PROJECT` | project id |
+| Variable | `AEGIS_REGION` | optional (default `us-central1`) |
+| Variable | `AEGIS_ALLOWED_DOMAIN` | optional (default `google.com`) |
+
+Set up WIF once (link the pool to your repo) following
+<https://github.com/google-github-actions/auth#preferred-direct-workload-identity-federation>,
+then either push a tag (`git tag v1.0.0 && git push --tags`) or run the workflow manually
+from the Actions tab.
+
 ## Notes & troubleshooting
 
 - **403 after sign-in** — your account isn't in an allowed domain/group, or IAM hasn't

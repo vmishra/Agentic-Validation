@@ -1,0 +1,42 @@
+name: Deploy to Cloud Run
+
+# Opt-in deploy. Runs on a version tag (v*) or manually.
+# Requires these repo settings (Settings → Secrets and variables → Actions):
+#   Secrets:   GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_SERVICE_ACCOUNT, GEMINI_API_KEY
+#   Variables: GCP_PROJECT   (optional: AEGIS_REGION, AEGIS_ALLOWED_DOMAIN, AEGIS_SERVICE)
+# See docs/DEPLOY.md → "Deploy from GitHub Actions".
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  deploy:
+    name: Build & deploy (IAP, domain-restricted)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write          # required for Workload Identity Federation
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (Workload Identity Federation)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy
+        env:
+          AEGIS_PROJECT: ${{ vars.GCP_PROJECT }}
+          AEGIS_REGION: ${{ vars.AEGIS_REGION }}
+          AEGIS_SERVICE: ${{ vars.AEGIS_SERVICE }}
+          AEGIS_ALLOWED_DOMAIN: ${{ vars.AEGIS_ALLOWED_DOMAIN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          gcloud components install beta --quiet || true
+          ./deploy.sh

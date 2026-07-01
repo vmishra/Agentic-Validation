@@ -159,6 +159,16 @@ docs/           ARCHITECTURE.md
 app.sh          one-command start/stop
 ```
 
+## Continuous integration
+
+GitHub Actions runs on every push/PR — backend `pytest` plus frontend typecheck/test/build
+([`.github/workflows/ci.yml`](.github/workflows/ci.yml)). An opt-in workflow deploys to
+Cloud Run on a `v*` tag ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml); see
+[`docs/DEPLOY.md`](docs/DEPLOY.md)).
+
+<!-- After creating the GitHub repo, add a status badge:
+![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg) -->
+
 ## Security & privacy
 
 - **Your key stays local.** It lives in `.env` (git-ignored) and is used only to call the Gemini API from your machine.
