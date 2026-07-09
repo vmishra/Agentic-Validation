@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Aegis — point it at an AI-agent codebase and a real Google ADK multi-agent validator (Gemini 3.5 Flash) grades it across architecture, functionality, security, performance and more, with concrete fixes.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "Vikas Mishra",
   "keywords": [
     "ai-agents", "agentic", "validation", "code-analysis", "google-adk",

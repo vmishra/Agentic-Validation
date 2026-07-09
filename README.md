@@ -1,18 +1,48 @@
 <div align="center">
 
-# 🛡️ Aegis — Agentic Validation
+<img src="public/favicon.svg" alt="Aegis logo" width="72" height="72" />
 
-**Point it at an AI-agent codebase. A real multi-agent validator reads the code, figures out what it does, and grades it — with concrete fixes.**
+# Aegis — Agentic Validation
 
-Aegis ingests an agent project (**GitHub URL, local folder, or `.zip`**), runs a **Google ADK multi-agent system** on **Gemini 3.5 Flash**, and returns a categorized readiness report: architecture, functionality, prompt/context engineering, model strategy, security, performance, and reliability — every finding pinned to a `path:line`.
+**Point it at an AI-agent codebase. A real multi-agent validator reads the code, figures out what it does, and grades it — every finding pinned to a `path:line`, with a concrete fix.**
+
+[![CI](https://github.com/vmishra/Agentic-Validation/actions/workflows/ci.yml/badge.svg)](https://github.com/vmishra/Agentic-Validation/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![Node 18+](https://img.shields.io/badge/Node-18%2B-339933?logo=node.js&logoColor=white)
+![Built with Google ADK](https://img.shields.io/badge/Built%20with-Google%20ADK-4285F4?logo=google&logoColor=white)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+Aegis ingests an agent project (**GitHub URL, local folder, or `.zip`**), runs a **Google ADK multi-agent system** on **Gemini 3.5 Flash**, and returns a categorized readiness report: architecture, functionality, prompt/context engineering, model strategy, security, performance, and reliability.
+
+<img src="docs/assets/report.png" alt="Aegis report: overall readiness score, per-category bars, strengths and gaps, and findings pinned to path:line with concrete fixes" width="900" />
 
 </div>
 
 ---
 
-## Why
+<details>
+<summary><b>Table of contents</b></summary>
 
-Teams are shipping agents fast, but "is this a *well-built* agent?" is hard to answer at scale. Aegis makes it a one-click scan. It's framework-agnostic (detects 18+ agent stacks), grounded in current best practices, and it will validate against **your own requirements** too — paste a Markdown spec and each requirement becomes a graded check.
+- [Why Aegis](#why-aegis)
+- [What you get](#what-you-get)
+- [How it works](#how-it-works)
+- [Validation categories](#validation-categories)
+- [Quick start](#quick-start)
+- [Configuration](#configuration)
+- [Deploy to Cloud Run](#deploy-to-cloud-run)
+- [Development](#development)
+- [Continuous integration](#continuous-integration)
+- [Security & privacy](#security--privacy)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+
+</details>
+
+## Why Aegis
+
+Teams are shipping agents fast, but *"is this a **well-built** agent?"* is hard to answer at scale. Aegis makes it a one-click scan. It's framework-agnostic (detects 18+ agent stacks), grounded in current best practices (it does live web research during a scan), and it will validate against **your own requirements** too — paste a Markdown spec and each requirement becomes a graded check.
 
 The validator is itself a clean ADK multi-agent system, so it doubles as a reference example of the patterns it checks for.
 
@@ -22,7 +52,7 @@ The validator is itself a clean ADK multi-agent system, so it doubles as a refer
 - **Purpose & architecture extraction** — Aegis first tells you what the app *is*, inferred from the code.
 - **7 validation categories, ~36 checks** — each finding has a status, severity, evidence, **the exact `path:line` to fix**, a concrete recommendation, and web citations where relevant.
 - **Bring your own spec** — upload/paste a `.md` requirements doc; each requirement is graded against the code.
-- **Pick what to validate** — all categories on by default; uncheck to narrow.
+- **Pick what to validate** — all categories on by default; uncheck to narrow the scan.
 - **Live run** — watch the agent graph light up and findings stream in.
 - **Scorecard + export** — overall readiness band, per-category scores, strengths/gaps; export to Markdown or JSON.
 - **Scan history** — past scans persist to disk; click to reopen.
@@ -52,6 +82,12 @@ The validator is itself a clean ADK multi-agent system, so it doubles as a refer
    └─────────────────────────┘
 ```
 
+Watch it run — the coordinator fans out to one auditor per category, in parallel, each grounded by a live `google_search`:
+
+<div align="center">
+<img src="docs/assets/scanning.png" alt="Aegis mid-scan: the agent graph with Research (google_search) done and all seven category auditors dispatched in parallel" width="900" />
+</div>
+
 Design choices that make it robust at scale: each auditor reasons over a **bounded evidence pack in a single call** (input size is constant regardless of repo size), every model call **retries transient errors with exponential backoff**, and a single failing category **degrades to a partial report** instead of aborting the scan. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Validation categories
@@ -69,36 +105,62 @@ Design choices that make it robust at scale: each auditor reasons over a **bound
 
 ## Quick start
 
+Aegis runs **entirely on your own machine** — one script starts the backend API and the web UI together. From clone to first scan takes about a minute.
+
 **Prerequisites**
 - **Python 3.10+**
 - **Node.js 18+** and npm
-- **git** (for scanning GitHub URLs)
+- **git** (to clone this repo and to scan GitHub URLs)
 - A **Google AI Studio API key** — free at <https://aistudio.google.com/apikey>
 
-**1. Configure your key**
+### 1 · Clone the repo
+```bash
+git clone https://github.com/vmishra/Agentic-Validation.git
+cd Agentic-Validation
+```
+Run every command below from this project folder.
+
+### 2 · Add your Gemini key
+Copy the template to create your local env file:
 ```bash
 cp .env.example .env
-# open .env and set GEMINI_API_KEY=your_key
 ```
+Then open **`.env`** (in the project root) and set the one required value:
+```ini
+GEMINI_API_KEY=your_key_here
+```
+`.env` is git-ignored — your key stays on your machine and is never committed. (Grab a free key at <https://aistudio.google.com/apikey>.)
 
-**2. Start**
+### 3 · Start it
 ```bash
 ./app.sh start
 ```
-First run creates a Python venv, installs backend + frontend deps, and launches both servers. Then open:
+The first run creates a Python virtualenv, installs the backend + frontend dependencies, and launches both servers. When it prints `✓ Aegis up`, open:
 
-**→ http://localhost:5176**
+👉 **http://localhost:5176**
 
-**3. Scan** — paste a GitHub URL (or a local folder path / `.zip`), optionally describe the use case and add a requirements spec, pick categories, and hit **Scan**.
-
+Manage the servers anytime (from the project root):
 ```bash
-./app.sh logs      # tail the combined log
-./app.sh stop      # stop both servers
-./app.sh restart   # restart
 ./app.sh status    # is it running?
+./app.sh logs      # tail the combined backend + frontend log
+./app.sh restart   # restart both
+./app.sh stop      # stop both
 ```
 
-> No key yet? The app still starts — it returns the deterministic static index and tells you to add a key for the full agentic validation.
+### 4 · Run a scan
+In the browser:
+
+1. **Choose a source** — a **GitHub URL**, a **local folder** path, or **upload a `.zip`**.
+2. *(optional)* **Describe the use case** so Aegis can judge how well the agent fits its purpose.
+3. *(optional)* **Add a requirements spec** (`.md`) — each requirement becomes its own graded check.
+4. **Pick categories** (all on by default), then click **Scan**.
+5. Watch the **agent graph** run live, then read the **scorecard + findings** — every finding has a `path:line` and a concrete fix. Export to **Markdown** or **JSON**, and reopen past scans from **Recent scans**.
+
+<div align="center">
+<img src="docs/assets/hero-source.png" alt="Aegis start screen: choose GitHub URL, local folder, or zip; describe the use case; pick which categories to validate" width="900" />
+</div>
+
+> **No key yet?** The app still starts and runs the deterministic static index (framework + signals). Add `GEMINI_API_KEY` to `.env`, run `./app.sh restart`, and you get the full agentic validation.
 
 ## Configuration
 
@@ -117,10 +179,10 @@ Ports are set on the shell (read by `app.sh` and Vite):
 AEGIS_FE_PORT=3000 AEGIS_BE_PORT=9000 ./app.sh start
 ```
 
-## Deploy to Cloud Run (private, Google SSO)
+## Deploy to Cloud Run
 
 Ship Aegis as an internal web app protected by **Identity-Aware Proxy** — only your
-Google Workspace domain (e.g. `@google.com`) can sign in. One command:
+Google Workspace domain (e.g. `@your-company.com`) can sign in. One command:
 
 ```bash
 gcloud config set project YOUR_PROJECT
@@ -129,8 +191,8 @@ AEGIS_ALLOWED_DOMAIN=your-company.com ./deploy.sh
 
 It builds a container (frontend + backend in one image), deploys to Cloud Run with IAP,
 stores your key in **Secret Manager**, and restricts access to your Google Workspace
-domain (`AEGIS_ALLOWED_DOMAIN`) — no load balancer needed. Local-folder scanning is auto-disabled in the cloud (users scan via
-GitHub URL or `.zip`). Full guide, options, and teardown: **[`docs/DEPLOY.md`](docs/DEPLOY.md)**.
+domain — no load balancer needed. Local-folder scanning is auto-disabled in the cloud
+(users scan via GitHub URL or `.zip`). Full guide, options, and teardown: **[`docs/DEPLOY.md`](docs/DEPLOY.md)**.
 
 ## Development
 
@@ -155,7 +217,7 @@ backend/        FastAPI + Google ADK validator
   scoring.py      deterministic scoring + report assembly
   agents/         overview · research · auditors · synthesizer · coordinator
 src/            React + Vite portal (source → scanning → report)
-docs/           ARCHITECTURE.md
+docs/           ARCHITECTURE.md · DEPLOY.md · assets/
 app.sh          one-command start/stop
 ```
 
@@ -165,9 +227,6 @@ GitHub Actions runs on every push/PR — backend `pytest` plus frontend typechec
 ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)). An opt-in workflow deploys to
 Cloud Run on a `v*` tag ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml); see
 [`docs/DEPLOY.md`](docs/DEPLOY.md)).
-
-<!-- After creating the GitHub repo, add a status badge:
-![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg) -->
 
 ## Security & privacy
 
@@ -181,7 +240,7 @@ Cloud Run on a `v*` tag ([`.github/workflows/deploy.yml`](.github/workflows/depl
 
 - Optional prebuilt scanners (detect-secrets, pip-audit/npm-audit, tree-sitter) for even stronger deterministic checks
 - PDF export and shareable report links
-- CI integration (GitHub Action) to gate PRs
+- CI integration (a GitHub Action) to gate PRs
 - Vertex AI auth path
 
 ## Contributing
@@ -190,4 +249,4 @@ Contributions welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## License
 
-[MIT](LICENSE) © 2026 Vikas Mishra
+[Apache-2.0](LICENSE) © 2026 Vikas Mishra

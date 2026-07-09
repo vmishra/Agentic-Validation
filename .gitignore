@@ -19,5 +19,5 @@ dist/
 .app.log
 .aegis-history/
 
-# tooling / os
+# os
 .DS_Store
